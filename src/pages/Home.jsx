@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Github, Minus, Plus, PlusCircle } from "lucide-react";
+import { Github, Minus, Plus } from "lucide-react";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 const denominations = [
   { value: 100000, label: "Rp 100.000", image: "/rupiah/100.webp" },
@@ -12,6 +14,9 @@ const denominations = [
 ];
 
 export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [images, setImages] = useState([]);
   const [counts, setCounts] = useState(() => {
     return JSON.parse(localStorage.getItem("counts")) ||
       denominations.reduce((acc, denom) => ({ ...acc, [denom.value]: 0 }), {});
@@ -19,6 +24,11 @@ export default function Home() {
   const [total, setTotal] = useState(() => {
     return JSON.parse(localStorage.getItem("grandTotal")) || 0;
   });
+
+  useEffect(() => {
+    setImages(denominations.map(d => d.image));
+  }, []);
+  
 
   useEffect(() => {
     localStorage.setItem("counts", JSON.stringify(counts));
@@ -51,14 +61,20 @@ export default function Home() {
     <div className="container max-w-md mx-auto p-4 space-y-4">
       <h1 className="text-xl font-bold text-center mb-6 pt-6">Hitung Duit Lebaran</h1>
       <div className="flex flex-col text-center mt-4 mb-6 p-10 bg-[#FFDE2C] text-black rounded-xl">
-        <h2 className="text-2xl font-bold pt-2">Total : Rp {total.toLocaleString("id-ID")},00</h2>
+        <p className="text-xs">Total</p>
+        <h2 className="text-2xl font-bold pt-2">Rp {total.toLocaleString("id-ID")},00</h2>
         <Button variant='link' className='text-black cursor-pointer' onClick={resetCounts}>
           Reset
         </Button>
       </div>
       {denominations.map(({ value, label, image }) => (
         <div key={value} className="flex items-center justify-between space-x-4 py-2">
-          <img src={image} alt={label} className="w-24 h-auto object-cover" />
+          <img src={image} alt={label} className="w-24 h-auto object-cover cursor-pointer" 
+            onClick={() => {
+              setPhotoIndex(0);
+              setIsOpen(true);
+            }}
+          />
           <p className="font-semibold">{label}</p>
           <p className="text-center">x</p>
           <p className="font-semibold">{counts[value]}</p>
@@ -91,6 +107,14 @@ export default function Home() {
           </a>
         </div>
       </div>
+      {/* Lightbox */}
+      <Lightbox
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          index={photoIndex}
+          slides={images.map((src) => ({ src }))}
+          on={{ view: ({ index }) => setPhotoIndex(index) }}
+        />
     </div>
   );
 }
