@@ -69,7 +69,10 @@ export default function Home() {
           </div>
         </div>
       ))}
-      <p className="text-xs font-light">Original idea : <a href="https://kiraduitraya.com/" target="_blank" className="underline">kiraduitraya.com</a> by <a className="font-semibold underline" href="https://x.com/afrieirham_" target="_blank">Afrie Irham</a></p>
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-light">Original idea : <a href="https://kiraduitraya.com/" target="_blank" className="underline">kiraduitraya.com</a> by <a className="font-semibold underline" href="https://x.com/afrieirham_" target="_blank">Afrie Irham</a></p>
+        <p className="text-xs font-light">Foto Duit : <a href="https://www.bi.go.id/id/rupiah/gambar-uang/default.aspx" target="_blank" className="underline">Bank Indonesia</a></p>
+      </div>
     </div>
   );
 }
