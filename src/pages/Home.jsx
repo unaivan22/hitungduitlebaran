@@ -26,10 +26,16 @@ export default function Home() {
   }, [counts, total]);
 
   const updateCount = (value, increment) => {
-    const newCount = Math.max(0, counts[value] + increment);
-    setCounts((prev) => ({ ...prev, [value]: newCount }));
-    setTotal((prev) => prev + value * increment);
-  };
+    setCounts((prev) => {
+      const newCount = Math.max(0, prev[value] + increment);
+      return { ...prev, [value]: newCount };
+    });
+  
+    setTotal((prev) => {
+      const newTotal = prev + value * increment;
+      return newTotal < 0 ? 0 : newTotal; // Pastikan total tidak negatif
+    });
+  };  
 
   const resetCounts = () => {
     setCounts(denominations.reduce((acc, denom) => ({ ...acc, [denom.value]: 0 }), {}));
