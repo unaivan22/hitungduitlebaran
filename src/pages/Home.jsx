@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Minus, Plus, PlusCircle } from "lucide-react";
+import { Github, Minus, Plus, PlusCircle } from "lucide-react";
 
 const denominations = [
   { value: 100000, label: "Rp 100.000", image: "/rupiah/100.webp" },
@@ -80,9 +80,16 @@ export default function Home() {
           </div>
         </div>
       ))}
-      <div className="flex flex-col gap-2">
-        <p className="text-xs font-light">Original idea : <a href="https://kiraduitraya.com/" target="_blank" className="underline">kiraduitraya.com</a> by <a className="font-semibold underline" href="https://x.com/afrieirham_" target="_blank">Afrie Irham</a></p>
-        <p className="text-xs font-light">Foto Duit : <a href="https://www.bi.go.id/id/rupiah/gambar-uang/default.aspx" target="_blank" className="underline">Bank Indonesia</a></p>
+      <div className="flex gap-2 justify-between items-center">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-light">Original idea : <a href="https://kiraduitraya.com/" target="_blank" className="underline">kiraduitraya.com</a> by <a className="font-semibold underline" href="https://x.com/afrieirham_" target="_blank">Afrie Irham</a></p>
+          <p className="text-xs font-light">Foto Duit : <a href="https://www.bi.go.id/id/rupiah/gambar-uang/default.aspx" target="_blank" className="underline">Bank Indonesia</a></p>
+        </div>
+        <div className="">
+          <a href="https://github.com/unaivan22/hitungduitlebaran" target="_blank">
+            <Button size='icon' variant='outline'><Github className="w-4 h-4" /></Button>
+          </a>
+        </div>
       </div>
     </div>
   );
