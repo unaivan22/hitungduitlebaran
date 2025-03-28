@@ -1,8 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Github, Minus, Plus } from "lucide-react";
+import { Edit2, Github, Minus, Plus, Users } from "lucide-react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Textarea } from "@/components/ui/textarea";
 
 const denominations = [
   { value: 100000, label: "Rp 100.000", image: "/rupiah/100.webp" },
@@ -24,37 +35,51 @@ export default function Home() {
   const [total, setTotal] = useState(() => {
     return JSON.parse(localStorage.getItem("grandTotal")) || 0;
   });
+  const [yangKasihDuit, setYangKasihDuit] = useState(() => {
+    return JSON.parse(localStorage.getItem("yangKasihDuit")) || {};
+  });
+  const [currentNote, setCurrentNote] = useState("");
+  const [editingValue, setEditingValue] = useState(null);
 
   useEffect(() => {
     setImages(denominations.map(d => d.image));
   }, []);
-  
 
   useEffect(() => {
     localStorage.setItem("counts", JSON.stringify(counts));
     localStorage.setItem("grandTotal", JSON.stringify(total));
-  }, [counts, total]);
+    localStorage.setItem("yangKasihDuit", JSON.stringify(yangKasihDuit));
+  }, [counts, total, yangKasihDuit]);
 
   const updateCount = (value, increment) => {
     setCounts((prevCounts) => {
-      const newCount = Math.max(0, prevCounts[value] + increment); // Hitung jumlah baru
-      const updatedCounts = { ...prevCounts, [value]: newCount }; // Perbarui state counts
-  
-      // Hitung ulang total berdasarkan seluruh nominal yang ada
+      const newCount = Math.max(0, prevCounts[value] + increment);
+      const updatedCounts = { ...prevCounts, [value]: newCount };
       const newTotal = Object.entries(updatedCounts).reduce(
         (acc, [key, count]) => acc + parseInt(key) * count,
         0
       );
-  
-      setTotal(newTotal); // Perbarui total
+
+      setTotal(newTotal);
       return updatedCounts;
     });
   };
-  
 
   const resetCounts = () => {
     setCounts(denominations.reduce((acc, denom) => ({ ...acc, [denom.value]: 0 }), {}));
     setTotal(0);
+    setYangKasihDuit({});
+  };
+
+  const handleSaveNote = () => {
+    if (editingValue !== null) {
+      setYangKasihDuit((prev) => {
+        const updatedNotes = { ...prev, [editingValue]: currentNote };
+        return updatedNotes;
+      });
+      setCurrentNote("");
+      setEditingValue(null);
+    }
   };
 
   return (
@@ -69,7 +94,7 @@ export default function Home() {
       </div>
       {denominations.map(({ value, label, image }) => (
         <div key={value} className="flex items-center justify-between space-x-4 py-2">
-          <img src={image} alt={label} className="w-24 h-auto object-cover cursor-pointer" 
+          <img src={image} alt={label} className="w-20 h-auto object-cover cursor-pointer" 
             onClick={() => {
               setPhotoIndex(0);
               setIsOpen(true);
@@ -83,6 +108,7 @@ export default function Home() {
               variant='secondary'
               size='icon'
               onClick={() => updateCount(value, -1)}
+              className='bg-orange-200 hover:bg-orange-300'
             >
               <Minus className="w-4 h-4" />
             </Button>
@@ -90,9 +116,56 @@ export default function Home() {
               variant='secondary'
               size='icon'
               onClick={() => updateCount(value, 1)}
+              className='bg-lime-200 hover:bg-lime-300'
             >
               <Plus className="w-4 h-4" />
             </Button>
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="secondary" size='icon' onClick={() => {
+                  setEditingValue(value);
+                  setCurrentNote(yangKasihDuit[value] || "");
+                }}>
+                  <Users className="w-4 h-4" />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <div className="mx-auto w-full max-w-sm">
+                  <DrawerHeader>
+                    <DrawerTitle className='text-center'>Yang Kasih Duit</DrawerTitle>
+                    <DrawerDescription>
+                      <div className="flex flex-col text-center">
+                        <p>Daftar orang yang kasih duit <span className="font-bold text-black">{label}</span></p>
+                        <div className="flex w-full items-center justify-center">
+                          <img src={image} alt={label} className="w-[270px] mt-4 h-auto object-cover cursor-pointer" 
+                            onClick={() => {
+                              setPhotoIndex(0);
+                              setIsOpen(true);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </DrawerDescription>
+                  </DrawerHeader>
+                  <div className="p-4 pb-0">
+                    <Textarea 
+                      placeholder="Yang kasih duit." 
+                      className='h-[200px]' 
+                      value={currentNote} 
+                      onChange={(e) => setCurrentNote(e.target.value)}
+                    />
+                  </div>
+                  <DrawerFooter>
+                    <DrawerClose asChild>
+                      <Button onClick={handleSaveNote}>Simpan</Button>
+                    </DrawerClose>
+                    <DrawerClose asChild>
+                      <Button variant="outline">Batal</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </div>
+              </DrawerContent>
+            </Drawer>
           </div>
         </div>
       ))}
@@ -101,20 +174,11 @@ export default function Home() {
           <p className="text-xs font-light">Original idea : <a href="https://kiraduitraya.com/" target="_blank" className="underline">kiraduitraya.com</a> by <a className="font-semibold underline" href="https://x.com/afrieirham_" target="_blank">Afrie Irham</a></p>
           <p className="text-xs font-light">Foto Duit : <a href="https://www.bi.go.id/id/rupiah/gambar-uang/default.aspx" target="_blank" className="underline">Bank Indonesia</a></p>
         </div>
-        <div className="">
-          <a href="https://github.com/unaivan22/hitungduitlebaran" target="_blank">
-            <Button size='icon' variant='outline'><Github className="w-4 h-4" /></Button>
-          </a>
-        </div>
+        <a href="https://github.com/unaivan22/hitungduitlebaran" target="_blank">
+          <Button size='icon' variant='outline'><Github className="w-4 h-4" /></Button>
+        </a>
       </div>
-      {/* Lightbox */}
-      <Lightbox
-          open={isOpen}
-          close={() => setIsOpen(false)}
-          index={photoIndex}
-          slides={images.map((src) => ({ src }))}
-          on={{ view: ({ index }) => setPhotoIndex(index) }}
-        />
+      <Lightbox open={isOpen} close={() => setIsOpen(false)} index={photoIndex} slides={images.map((src) => ({ src }))} on={{ view: ({ index }) => setPhotoIndex(index) }} />
     </div>
   );
 }
